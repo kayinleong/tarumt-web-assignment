@@ -1,0 +1,9 @@
+N = Normal
+S = Expired
+
+CREATE TABLE `volunteers` (
+  `id` int(6) NOT NULL AUTO_INCREMENT,
+  `user_id` int(6) NOT NULL,
+  `status` char(1) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
