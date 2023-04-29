@@ -7,7 +7,10 @@ if ($con->connect_error) {
     die("Connection failed: " . $con->connect_error);
 }
 
-$sql = "SELECT * FROM movie_showtimes";
+$sql = "SELECT * 
+        FROM movie_showtimes 
+        ORDER BY id DESC
+        LIMIT 3";
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
@@ -148,29 +151,34 @@ if ($result->num_rows > 0) {
                 foreach ($movie_showtimes as $movie_showtime) {
                     $id = $movie_showtime['id'];
                     $name = $movie_showtime['name'];
-                    $formatted_final_price = number_format(($movie_showtime['discount_rate'] / 100) * $movie_showtime['price'], 2, ".", " ");
-                    $description = empty($movie_showtime['description']) ? "No description" : $movie_showtime['description'];
-
-                    $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
-                    if ($con->connect_error) {
-                        die("Connection failed: " . $con->connect_error);
-                    }
-
+                    $formatted_final_price = number_format($movie_showtime['price'] - (($movie_showtime['discount_rate'] / 100) * $movie_showtime['price']), 2, ".", " ");
+                    $description = $movie_showtime['description'] ?? "";
                     $movie_id = $movie_showtime['movie_id'];
-                    $sql = "SELECT name, pic_url FROM movies WHERE id = $movie_id";
+
+                    $sql = "SELECT name, description, pic_url FROM movies WHERE id = $movie_id";
                     $result = $con->query($sql);
                     if ($result->num_rows > 0) {
                         $movie = $result->fetch_assoc();
                     }
 
+                    $movie_name = $movie['name'];
                     $pic_url = $movie['pic_url'];
+                    $movie_description = $movie['description'] ?? "";
                     echo "<div class=\"max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700\">
                             <img class=\"rounded-t-lg\" src=\"/assignment/wwwroot/images/movies/$pic_url\" alt=\"\" />
                             <div class=\"p-5\">
                                 <h5 class=\"mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white\">
                                     $name
                                 </h5>
-                                <p class=\"mb-3 font-normal text-gray-700 dark:text-gray-400\">
+                                <span class=\"text-lg text-gray-700 dark:text-gray-400\">
+                                    $movie_name
+                                </span>
+
+                                <p class=\"my-3 font-normal text-gray-700 dark:text-gray-400\">
+                                    $movie_description
+
+                                    <br />
+
                                     $description
                                 </p>
                                 <div class=\"mb-3\">
@@ -198,11 +206,6 @@ if ($result->num_rows > 0) {
             $name = $movie_showtime['name'];
             $final_price = ($movie_showtime['discount_rate'] / 100) * $movie_showtime['price'];
             $description = empty($movie_showtime['description']) ? "No description" : $movie_showtime['description'];
-
-            $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
-            if ($con->connect_error) {
-                die("Connection failed: " . $con->connect_error);
-            }
 
             echo "<div id=\"modal_$id\" tabindex=\"-1\" aria-hidden=\"true\" class=\"fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] md:h-full\">
                     <div class=\"p-5 relative w-full h-full max-w-2xl md:h-auto\">
@@ -307,7 +310,7 @@ if ($result->num_rows > 0) {
                 echo "$id: 0,";
             }
             ?>
-        }
+        };
 
         function guest_select_seat(movie_id, seat_num, seat_price) {
             var seatElem = document.getElementsByClassName(`seat ${movie_id} ${seat_num}`)[0];
@@ -366,3 +369,7 @@ if ($result->num_rows > 0) {
 </body>
 
 </html>
+
+<?php
+$con->close();
+?>

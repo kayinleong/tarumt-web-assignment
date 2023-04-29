@@ -1,5 +1,4 @@
 <?php
-include '../includes/enum.php';
 include '../includes/functions/db.php';
 include '../includes/functions/auth.php';
 

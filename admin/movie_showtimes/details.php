@@ -1,10 +1,9 @@
 <?php
-include '../../includes/enum.php';
 include '../../includes/functions/auth.php';
 
 redirect_if_not_logged_in_and_not_admin();
 
-if (!empty($_POST)) {
+if (!empty($_POST) && $_POST === 'Delete') {
     $id = $_POST['id'] ?? "";
     $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
     if ($con->connect_error) {
@@ -27,9 +26,9 @@ if (isset($_GET['id'])) {
     }
 
     $sql = "SELECT * FROM movie_showtimes WHERE id = $id";
-    $result = mysqli_query($con, $sql);
-    if (mysqli_num_rows($result) > 0) {
-        $movie_showtime = mysqli_fetch_assoc($result);
+    $result = $con->query($sql);
+    if ($result->num_rows > 0) {
+        $movie_showtime = $result->fetch_assoc();
     }
 } else {
     header("Location: /assignment/admin/movie_showtimes");
@@ -141,11 +140,6 @@ if (isset($_GET['id'])) {
                                     <label for="movie" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select a Movie</label>
                                     <select id="movie" name="movie" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                         <?php
-                                        $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
-                                        if ($con->connect_error) {
-                                            die("Connection failed: " . $con->connect_error);
-                                        }
-
                                         $sql = "SELECT id, name FROM movies";
                                         $result = $con->query($sql);
                                         if ($result->num_rows > 0) {
@@ -276,9 +270,7 @@ if (isset($_GET['id'])) {
                                     <button data-modal-hide="staticDeleteModal" type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
                                         Cancel
                                     </button>
-                                    <button type="submit" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
-                                        Delete
-                                    </button>
+                                    <input type="submit" name="sub" value="Delete" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" />
                                 </div>
                             </div>
                         </form>
@@ -338,3 +330,7 @@ if (isset($_GET['id'])) {
 </body>
 
 </html>
+
+<?php
+$con->close();
+?>

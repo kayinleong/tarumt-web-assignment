@@ -1,5 +1,4 @@
 <?php
-include '../../includes/enum.php';
 include "../../includes/functions/db.php";
 include '../../includes/functions/auth.php';
 include '../../includes/functions/image.php';
@@ -36,8 +35,10 @@ if (isset($_POST['sub']) && $_POST['sub'] === 'Create') {
             die("Connection failed: " . $con->connect_error);
         }
 
-        $sql = "INSERT INTO movies (name, description, pic_url) VALUES ('$name', '$description', '$newImageName')";
-        $con->query($sql);
+        $sql = "INSERT INTO movies (name, description, pic_url) VALUES (?, ?, ?)";
+        $stmt = $con->prepare($sql);
+        $stmt->bind_param("sss", $name, $description, $newImageName);
+        $stmt->execute();
         if ($con->affected_rows > 0) {
             header("Location: /assignment/admin/movies");
             die();
@@ -46,6 +47,7 @@ if (isset($_POST['sub']) && $_POST['sub'] === 'Create') {
 }
 
 $movie_showtimes = array();
+
 $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
 if ($con->connect_error) {
     die("Connection failed: " . $con->connect_error);
@@ -66,12 +68,12 @@ if (mysqli_num_rows($result) > 0) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Showtime - Dashboard</title>
+    <title>Movie - Dashboard</title>
     <link rel="icon" type="image/x-icon" href="/assignment/wwwroot/images/favicon.ico">
     <?php include "../../includes/styles.php"; ?>
 </head>
 
-<body class="overflow-hidden">
+<body>
     <?php include "../../includes/header_admin.php"; ?>
 
     <main class="container mx-auto mt-24 px-4 scroll-smooth">
@@ -192,7 +194,15 @@ if (mysqli_num_rows($result) > 0) {
                                         </td>
                                     </tr>";
                             }
+
+                            if (empty($movie_showtime)) {
                             ?>
+                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    <td colspan="3" class="px-6 py-4 whitespace-nowrap dark:text-white">
+                                        No movies found.
+                                    </td>
+                                </tr>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>
@@ -262,8 +272,11 @@ if (mysqli_num_rows($result) > 0) {
         <?php include "../../includes/footer.php"; ?>
     </main>
 
-
     <?php include "../../includes/scripts.php"; ?>
 </body>
 
 </html>
+
+<?php
+$con->close();
+?>

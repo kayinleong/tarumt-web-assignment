@@ -1,24 +1,8 @@
 <?php
-include "../../includes/enum.php";
 include "../../includes/functions/db.php";
 include '../../includes/functions/auth.php';
 
 redirect_if_not_logged_in_and_not_admin();
-
-$users = array();
-
-$con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
-if ($con->connect_error) {
-    die("Connection failed: " . $con->connect_error);
-}
-
-$sql = "SELECT * FROM users";
-$result = mysqli_query($con, $sql);
-if (mysqli_num_rows($result) > 0) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        array_push($users, $row);
-    }
-}
 
 if (isset($_POST['sub'])) {
     $username = $_POST["username"] ?? "";
@@ -73,13 +57,29 @@ if (isset($_POST['sub'])) {
         $sql = "INSERT INTO users (username, password, email, dob) VALUES ('$username', '$password_hashed', '$email', '$dob_formated')";
 
         if ($con->query($sql) && $con->affected_rows > 0) {
-            header("Location: /assignment/admin/users/?from=" . FromUrl::get_array()['REGISTER_SUCCESS']);
+            header("Location: /assignment/admin/users/");
             die();
         } else {
             array_push($errors, "Something went wrong! Please try again later!");
         }
     }
 }
+
+$users = array();
+
+$con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
+if ($con->connect_error) {
+    die("Connection failed: " . $con->connect_error);
+}
+
+$sql = "SELECT * FROM users";
+$result = $con->query($sql);
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        array_push($users, $row);
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -238,7 +238,15 @@ if (isset($_POST['sub'])) {
                                             </td>
                                         </tr>";
                                 }
+
+                                if (empty($users)) {
                                 ?>
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                        <td colspan="3" class="px-6 py-4 whitespace-nowrap dark:text-white">
+                                            No users found.
+                                        </td>
+                                    </tr>
+                                <?php } ?>
                             </tbody>
                         </table>
                     </div>
@@ -316,3 +324,7 @@ if (isset($_POST['sub'])) {
 </body>
 
 </html>
+
+<?php
+$con->close();
+?>

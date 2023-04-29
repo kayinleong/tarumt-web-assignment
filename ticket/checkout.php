@@ -70,6 +70,7 @@ $movie = $result->fetch_assoc();
                     <label for="ticket_billing_address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Billing Address</label>
                     <input type="text" id="ticket_billing_address" name="ticket_billing_address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Billing Address" required>
                 </div>
+
                 <div class="mt-2">
                     <label for="ticket_campus" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Campus</label>
                     <select id="ticket_campus" name="ticket_campus" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
@@ -177,3 +178,7 @@ $movie = $result->fetch_assoc();
 </body>
 
 </html>
+
+<?php
+$con->close();
+?>

@@ -1,11 +1,10 @@
 <?php
-include '../../includes/enum.php';
 include "../../includes/functions/db.php";
 include '../../includes/functions/auth.php';
 
 redirect_if_not_logged_in_and_not_admin();
 
-if (isset($_POST['sub'])) {
+if (isset($_POST['sub']) && $_POST['sub'] === 'Create') {
     $name = $_POST['name'];
     $movie = $_POST['movie'];
     $description = $_POST['description'];
@@ -196,15 +195,10 @@ if ($result->num_rows > 0) {
                             foreach ($movie_showtimes as $movie_showtime) {
                                 $id = $movie_showtime['id'];
                                 $name = $movie_showtime['name'];
-                                $final_price = number_format(($movie_showtime['discount_rate'] / 100) * $movie_showtime['price'], 2, ".", " ");
-                                $start_datetime = date("m/d/Y H:i:s", strtotime(str_replace('-', '/', $movie_showtime['start_datetime'])));
-                                $end_datetime = $movie_showtime['end_datetime'];
+                                $final_price = number_format($movie_showtime['price'] - (($movie_showtime['discount_rate'] / 100) * $movie_showtime['price']), 2, ".", " ");
+                                $start_datetime = date("m/d/Y H:i", strtotime(str_replace('-', '/', $movie_showtime['start_datetime'])));
+                                $end_datetime = date("m/d/Y H:i", strtotime(str_replace('-', '/', $movie_showtime['end_datetime'])));
                                 $status = $movie_showtime['status'] == 'N' ? "On-Going" : "Ended";
-
-                                $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
-                                if ($con->connect_error) {
-                                    die("Connection failed: " . $con->connect_error);
-                                }
 
                                 $sql = "SELECT name FROM movies WHERE id = " . $movie_showtime['movie_id'] . "";
                                 $result = $con->query($sql);
@@ -236,7 +230,15 @@ if ($result->num_rows > 0) {
                                         </td>
                                     </tr>";
                             }
+
+                            if (empty($movie_showtimes)) {
                             ?>
+                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    <td colspan="3" class="px-6 py-4 whitespace-nowrap dark:text-white">
+                                        No movie showtimes found.
+                                    </td>
+                                </tr>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>
@@ -282,11 +284,6 @@ if ($result->num_rows > 0) {
                                 <label for="movie" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select a Movie</label>
                                 <select id="movie" name="movie" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                     <?php
-                                    $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
-                                    if ($con->connect_error) {
-                                        die("Connection failed: " . $con->connect_error);
-                                    }
-
                                     $sql = "SELECT id, name FROM movies";
                                     $result = $con->query($sql);
                                     if ($result->num_rows > 0) {
@@ -329,7 +326,7 @@ if ($result->num_rows > 0) {
                                 <div></div>
                                 <div>
                                     <button data-modal-hide="staticNewEventModal" type="button" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Cancel</button>
-                                    <button type="submit" name="sub" value="create" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Create</button>
+                                    <input type="submit" name="sub" value="Create" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" />
                                 </div>
                             </div>
                         </form>
@@ -341,8 +338,11 @@ if ($result->num_rows > 0) {
         <?php include "../../includes/footer.php"; ?>
     </main>
 
-
     <?php include "../../includes/scripts.php"; ?>
 </body>
 
 </html>
+
+<?php
+$con->close();
+?>

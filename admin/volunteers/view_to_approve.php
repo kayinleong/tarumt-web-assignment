@@ -11,7 +11,7 @@ if (isset($_POST['sub']) && $_POST['sub'] === 'Remove') {
         die("Connection failed: " . $con->connect_error);
     }
 
-    $sql = "UPDATE volunteers SET status = 'N' WHERE id = $id";
+    $sql = "UPDATE volunteers SET status = 'F' WHERE id = $id";
     $result = $con->query($sql);
     if ($result) {
         header("Location: /assignment/admin/volunteers/");
@@ -19,22 +19,7 @@ if (isset($_POST['sub']) && $_POST['sub'] === 'Remove') {
     }
 }
 
-if (isset($_POST['sub']) && $_POST['sub'] === 'Suspend') {
-    $id = $_POST['id'];
-    $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
-    if ($con->connect_error) {
-        die("Connection failed: " . $con->connect_error);
-    }
-
-    $sql = "UPDATE volunteers SET status = 'S' WHERE id = $id";
-    $result = $con->query($sql);
-    if ($result) {
-        header("Location: /assignment/admin/volunteers/");
-        die();
-    }
-}
-
-if (isset($_POST['sub']) && $_POST['sub'] === 'Unsuspend') {
+if (isset($_POST['sub']) && $_POST['sub'] === 'Approve') {
     $id = $_POST['id'];
     $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
     if ($con->connect_error) {
@@ -48,7 +33,6 @@ if (isset($_POST['sub']) && $_POST['sub'] === 'Unsuspend') {
         die();
     }
 }
-
 
 $id = $_GET['id'];
 
@@ -57,10 +41,9 @@ if ($con->connect_error) {
     die("Connection failed: " . $con->connect_error);
 }
 
-$sql = "SELECT v.id, v.reason, v.campus, v.status, v.date_joined, u.username, u.email
-        FROM volunteers v JOIN users u 
-        ON v.user_id = u.id
-        WHERE v.id = $id AND v.status IN ('N', 'S')";
+$sql = "SELECT * FROM volunteers v
+        JOIN users u ON v.user_id = u.id
+        WHERE v.id = $id AND v.status = 'P'";
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     $data = $result->fetch_assoc();
@@ -203,19 +186,20 @@ switch ($data['campus']) {
                                     <input type="text" id="disabled-input" aria-label="disabled input" class="mb-6 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" value="<?php echo $campus ?>" disabled>
                                 </div>
 
+                                <hr class="mx-5">
+
+                                <div class="mt-3">
+                                    <label for="reason" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Application Reason</label>
+                                    <textarea id="reason" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 hover:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" disabled><?php echo $data['reason'] ?></textarea>
+                                </div>
+
                                 <div class="mt-5 flex flex-row justify-between">
                                     <div></div>
                                     <div>
                                         <form action="">
                                             <input type="hidden" name="id" value="<?php echo $id; ?>">
                                             <input type="submit" name="sub" value="Remove" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" />
-                                            <?php
-
-                                            if ($data['status'] === "N")
-                                                echo "<input type=\"submit\" name=\"sub\" value=\"Suspend\" class=\"focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-yellow-900\" />";
-                                            else
-                                                echo "<input type=\"submit\" name=\"sub\" value=\"Unsuspend\" class=\"focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800\" />";
-                                            ?>
+                                            <input type="submit" name="sub" value="Approve" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" />
                                         </form>
                                     </div>
                                 </div>

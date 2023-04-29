@@ -1,6 +1,5 @@
 <?php
 include "../includes/functions/db.php";
-include "../includes/enum.php";
 include "../includes/functions/utils.php";
 include "../includes/functions/auth.php";
 
@@ -26,6 +25,13 @@ if (isset($_GET['ticket_id'])) {
 	$seat_number = json_decode($result_data['seat_number']);
 	$start_datetime = date_create($result_data['start_datetime']);
 	$end_datetime = date_create($result_data['end_datetime']);
+
+	$qrCodeData = array();
+	$qrCodeData['ticket_id'] = $ticket_id;
+	$qrCodeData['seat_number'] = $seat_number;
+} else {
+	header("Location: /assignment");
+	die();
 }
 ?>
 <!DOCTYPE html>
@@ -83,13 +89,7 @@ if (isset($_GET['ticket_id'])) {
 							</p>
 						</div>
 						<div class="barcode">
-							<img src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=
-							<?php
-							$obj = array();
-							$obj['ticket_id'] = $ticket_id;
-							$obj['seat_number'] = $seat_number;
-							echo base64_url_encode(json_encode($obj));
-							?>" alt="QR code">
+							<img src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=<?php echo base64_url_encode(json_encode($qrCodeData)); ?>" alt="QR code">
 						</div>
 					</div>
 				</div>
@@ -101,3 +101,7 @@ if (isset($_GET['ticket_id'])) {
 </body>
 
 </html>
+
+<?php
+$con->close();
+?>

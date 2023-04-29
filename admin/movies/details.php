@@ -1,5 +1,4 @@
 <?php
-include '../../includes/enum.php';
 include '../../includes/functions/auth.php';
 include '../../includes/functions/image.php';
 
@@ -63,7 +62,6 @@ if (isset($_POST['sub']) && $_POST['sub'] === 'Delete') {
     }
 }
 
-$movie;
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
     $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
@@ -89,7 +87,7 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Showtime Details - Dashboard</title>
+    <title>Movie Details - Dashboard</title>
     <link rel="icon" type="image/x-icon" href="/assignment/wwwroot/images/favicon.ico">
     <?php include "../../includes/styles.php"; ?>
 </head>
@@ -316,3 +314,7 @@ if (isset($_GET['id'])) {
 </body>
 
 </html>
+
+<?php
+$con->close();
+?>

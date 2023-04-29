@@ -1,5 +1,4 @@
 <?php
-include "../../includes/enum.php";
 include "../../includes/functions/db.php";
 include '../../includes/functions/auth.php';
 
@@ -15,8 +14,8 @@ if (isset($_GET['id'])) {
     }
 
     $sql = "SELECT * FROM users WHERE id = $id";
-    $result = mysqli_query($con, $sql);
-    if (mysqli_num_rows($result) > 0) {
+    $result = $con->query($sql);
+    if ($result->num_rows > 0) {
         $user = mysqli_fetch_assoc($result);
     }
 } else {
@@ -24,7 +23,7 @@ if (isset($_GET['id'])) {
     die();
 }
 
-if (isset($_POST['sub']) && $_POST['sub'] === "update") {
+if (isset($_POST['sub']) && $_POST['sub'] === "Update") {
     $id = $_POST['id'] ?? "";
     $username = $_POST['username'] ?? "";
     $email = $_POST['email'] ?? "";
@@ -65,7 +64,7 @@ if (isset($_POST['sub']) && $_POST['sub'] === "update") {
     }
 }
 
-if (isset($_POST['sub']) && $_POST['sub'] === 'delete') {
+if (isset($_POST['sub']) && $_POST['sub'] === 'Delete') {
     $id = $_POST['id'] ?? "";
     $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
     if ($con->connect_error) {
@@ -225,9 +224,7 @@ if (isset($_POST['sub']) && $_POST['sub'] === 'delete') {
                                         <button data-modal-target="staticDeleteModal" data-modal-toggle="staticDeleteModal" type="button" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
                                             Delete
                                         </button>
-                                        <button type="submit" name="sub" value="update" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                            Update
-                                        </button>
+                                        <input type="submit" name="sub" value="Update" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" />
                                     </div>
                                 </div>
                             </form>
@@ -264,9 +261,7 @@ if (isset($_POST['sub']) && $_POST['sub'] === 'delete') {
                                     <button data-modal-hide="staticDeleteModal" type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
                                         Cancel
                                     </button>
-                                    <button type="submit" name="sub" value="delete" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
-                                        Delete
-                                    </button>
+                                    <inpit type="submit" name="sub" value="Delete" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" />
                                 </div>
                             </div>
                         </form>
@@ -282,3 +277,7 @@ if (isset($_POST['sub']) && $_POST['sub'] === 'delete') {
 </body>
 
 </html>
+
+<?php
+$con->close();
+?>

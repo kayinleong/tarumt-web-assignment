@@ -1,8 +1,31 @@
 <?php
-include '../../includes/enum.php';
+include '../../includes/functions/db.php';
 include '../../includes/functions/auth.php';
 
 redirect_if_not_logged_in_and_not_admin();
+
+$con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
+if ($con->connect_error) {
+    die("Connection failed: " . $con->connect_error);
+}
+
+$sql = "SELECT * FROM volunteers WHERE status NOT IN ('P', 'F')";
+$result = $con->query($sql);
+$volunteers = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        array_push($volunteers, $row);
+    }
+}
+
+$sql = "SELECT * FROM volunteers WHERE status = 'P'";
+$result = $con->query($sql);
+$volunteers_pending = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        array_push($volunteers_pending, $row);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -119,57 +142,64 @@ redirect_if_not_logged_in_and_not_admin();
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Username 01
-                                    </th>
-                                    <td class="px-6 py-4">
-                                        mail_01@mail.com
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        05/31/1991
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        Normal
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <a href="/assignment/admin/volunteers/details.php?id=1" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Details</a>
-                                    </td>
-                                </tr>
-                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Username 02
-                                    </th>
-                                    <td class="px-6 py-4">
-                                        mail_02@mail.com
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        05/31/1991
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        Normal
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <a href="/assignment/admin/volunteers/details.php?id=1" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Details</a>
-                                    </td>
-                                </tr>
-                                <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Username 03
-                                    </th>
-                                    <td class="px-6 py-4">
-                                        mail_03@mail.com
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        05/31/1991
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        Suspended
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <a href="/assignment/admin/volunteers/details.php?id=1" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Details</a>
-                                    </td>
-                                </tr>
+                                <?php
+                                foreach ($volunteers as $volunteer) {
+                                    $sql = "SELECT * FROM users WHERE id = " . $volunteer['user_id'];
+                                    $result = $con->query($sql);
+                                    $user = $result->fetch_assoc();
+
+                                    $id = $volunteer['id'];
+                                    $username = $user['username'];
+                                    $email = $user['email'];
+                                    $date_joined = date("m/d/Y H:i", strtotime(str_replace('-', '/', $volunteer['date_joined'])));
+
+                                    switch ($volunteer['status']) {
+                                        case "P":
+                                            $status = "Waiting for Approval";
+                                            break;
+
+                                        case "S":
+                                            $status = "Suspended";
+                                            break;
+
+                                        case "N":
+                                            $status = "Normal";
+                                            break;
+
+                                        default:
+                                            $status = "Unknown";
+                                            break;
+                                    }
+
+                                    echo "
+                                    <tr class=\"bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600\">
+                                        <th scope=\"row\" class=\"px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white\">
+                                            $username
+                                        </th>
+                                        <td class=\"px-6 py-4\">
+                                            $email
+                                        </td>
+                                        <td class=\"px-6 py-4\">
+                                            $date_joined
+                                        </td>
+                                        <td class=\"px-6 py-4\">
+                                            $status
+                                        </td>
+                                        <td class=\"px-6 py-4 text-right\">
+                                            <a href=\"/assignment/admin/volunteers/details.php?id=$id\" class=\"font-medium text-blue-600 dark:text-blue-500 hover:underline\">Details</a>
+                                        </td>
+                                    </tr>
+                                    ";
+                                }
+
+                                if (empty($volunteers)) {
+                                ?>
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                        <td colspan="3" class="px-6 py-4 whitespace-nowrap dark:text-white">
+                                            No volunteers found.
+                                        </td>
+                                    </tr>
+                                <?php } ?>
                             </tbody>
                         </table>
                     </div>
@@ -205,63 +235,48 @@ redirect_if_not_logged_in_and_not_admin();
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Username 01
-                                    </th>
-                                    <td class="px-6 py-4">
-                                        mail_01@mail.com
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        05/31/1991
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        Request for Approval
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button type="button" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                                            Approve
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Username 02
-                                    </th>
-                                    <td class="px-6 py-4">
-                                        mail_02@mail.com
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        05/31/1991
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        Request for Approval
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button type="button" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                                            Approve
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Username 03
-                                    </th>
-                                    <td class="px-6 py-4">
-                                        mail_03@mail.com
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        05/31/1991
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        Request for Approval
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button type="button" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                                            Approve
-                                        </button>
-                                    </td>
-                                </tr>
+                                <?php
+                                foreach ($volunteers_pending as $volunteer_pending) {
+                                    $sql = "SELECT * FROM users WHERE id = " . $volunteer_pending['user_id'];
+                                    $result = $con->query($sql);
+                                    $user = $result->fetch_assoc();
+
+                                    $id = $volunteer_pending['id'];
+                                    $username = $user['username'];
+                                    $email = $user['email'];
+                                    $date_joined = date("m/d/Y H:i", strtotime(str_replace('-', '/', $volunteer_pending['date_joined'])));
+
+                                    echo "
+                                    <tr class=\"bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600\">
+                                        <th scope=\"row\" class=\"px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white\">
+                                            $username
+                                        </th>
+                                        <td class=\"px-6 py-4\">
+                                            $email
+                                        </td>
+                                        <td class=\"px-6 py-4\">
+                                            $date_joined
+                                        </td>
+                                        <td class=\"px-6 py-4\">
+                                            Request for Approval
+                                        </td>
+                                        <td class=\"px-6 py-4 text-right\">
+                                            <a href='/assignment/admin/volunteers/view_to_approve.php?id=$id' class=\"font-medium text-blue-600 dark:text-blue-500 hover:underline\">
+                                                View to Approve
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    ";
+                                }
+
+                                if (empty($volunteers_pending)) {
+                                ?>
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                        <td colspan="3" class="px-6 py-4 whitespace-nowrap dark:text-white">
+                                            No applicant found.
+                                        </td>
+                                    </tr>
+                                <?php } ?>
                             </tbody>
                         </table>
                     </div>
@@ -276,3 +291,7 @@ redirect_if_not_logged_in_and_not_admin();
 </body>
 
 </html>
+
+<?php
+$con->close();
+?>
