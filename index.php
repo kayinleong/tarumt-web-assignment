@@ -204,7 +204,7 @@ if ($result->num_rows > 0) {
         foreach ($movie_showtimes as $movie_showtime) {
             $id = $movie_showtime['id'];
             $name = $movie_showtime['name'];
-            $final_price = ($movie_showtime['discount_rate'] / 100) * $movie_showtime['price'];
+            $final_price = $movie_showtime['price'] - (($movie_showtime['discount_rate'] / 100) * $movie_showtime['price']);
             $description = empty($movie_showtime['description']) ? "No description" : $movie_showtime['description'];
 
             echo "<div id=\"modal_$id\" tabindex=\"-1\" aria-hidden=\"true\" class=\"fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] md:h-full\">

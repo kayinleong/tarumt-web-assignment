@@ -11,7 +11,8 @@ if (isset($_POST['sub']) && $_POST['sub'] === 'Remove') {
         die("Connection failed: " . $con->connect_error);
     }
 
-    $sql = "UPDATE volunteers SET status = 'N' WHERE id = $id";
+    // delete query
+    $sql = "DELETE FROM volunteers WHERE id = $id";
     $result = $con->query($sql);
     if ($result) {
         header("Location: /assignment/admin/volunteers/");

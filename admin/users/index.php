@@ -14,6 +14,11 @@ if (isset($_POST['sub'])) {
     $insert_success = false;
     $errors = array();
 
+    $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
+    if ($con->connect_error) {
+        die("Connection failed: " . $con->connect_error);
+    }
+
     if (empty($username))
         array_push($errors, "Username is required!");
     else {
@@ -54,6 +59,7 @@ if (isset($_POST['sub'])) {
     if (empty($errors)) {
         $password_hashed = password_hash($password, PASSWORD_DEFAULT);
         $dob_formated = date("Y-m-d", strtotime(str_replace('-', '/', $dob)));
+
         $sql = "INSERT INTO users (username, password, email, dob) VALUES ('$username', '$password_hashed', '$email', '$dob_formated')";
 
         if ($con->query($sql) && $con->affected_rows > 0) {
@@ -270,6 +276,20 @@ if ($result->num_rows > 0) {
                         </div>
 
                         <div class="p-6 space-y-6">
+                            <?php
+                            if (isset($_POST["sub"]) && count($errors) > 0) {
+                                echo "<div class='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4' role='alert'>";
+                                echo "<strong class='font-bold'>Error!</strong>";
+                                echo "<span class='block sm:inline'> Please fix the following errors:</span>";
+                                echo "<ul class='list-disc list-inside'>";
+                                foreach ($errors as $error) {
+                                    echo "<li>$error</li>";
+                                }
+                                echo "</ul>";
+                                echo "</div>";
+                            }
+                            ?>
+
                             <form action="" method="post">
                                 <div>
                                     <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>

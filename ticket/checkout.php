@@ -75,11 +75,11 @@ $movie = $result->fetch_assoc();
                     <label for="ticket_campus" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Campus</label>
                     <select id="ticket_campus" name="ticket_campus" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         <option value="KL">Kuala Lumpur Main Campus</option>
-                        <option value="PG">Penang Brunch Campus</option>
-                        <option value="PK">Perak Brunch Campus</option>
-                        <option value="JH">Johor Brunch Campus</option>
-                        <option value="PH">Pahang Brunch Campus</option>
-                        <option value="SB">Sabah Brunch Campus</option>
+                        <option value="PG">Penang Branch Campus</option>
+                        <option value="PK">Perak Branch Campus</option>
+                        <option value="JH">Johor Branch Campus</option>
+                        <option value="PH">Pahang Branch Campus</option>
+                        <option value="SB">Sabah Branch Campus</option>
                     </select>
                 </div>
 

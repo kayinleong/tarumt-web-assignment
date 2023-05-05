@@ -3,7 +3,7 @@ include '../../includes/functions/auth.php';
 
 redirect_if_not_logged_in_and_not_admin();
 
-if (!empty($_POST) && $_POST === 'Delete') {
+if (isset($_POST['sub']) && $_POST['sub'] === 'Delete') {
     $id = $_POST['id'] ?? "";
     $con = new mysqli(DOMAIN, USERNAME, PASSWORD, DATABASE);
     if ($con->connect_error) {
@@ -212,7 +212,7 @@ if (isset($_GET['id'])) {
                                                 if (in_array($seat_num, json_decode($movie_showtime["available_seat"])))
                                                     echo "<div class=\"seat\" onclick=\"select_seat($seat_num)\"></div>";
                                                 else
-                                                    echo "<div class=\"seat selected\" onclick=\"select_seat($seat_num)\"></div>";
+                                                    echo "<div class=\"seat sold\" onclick=\"select_seat($seat_num)\"></div>";
 
                                                 if ($count == 8) {
                                                     echo "</div>";
